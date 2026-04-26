@@ -4,8 +4,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
-    // 10.0.2.2 is the special IP address for Android Emulator to access host localhost
-    private static final String BASE_URL = "http://10.0.2.2:8080/api/";
+    // For Emulator use: http://10.0.2.2:8080/api/
+    // For Physical Device use: http://<YOUR_MAC_IP>:8080/api/
+    // Your Mac's current Wi-Fi IP: 10.7.33.119
+    private static final String BASE_URL = "https://uninfectiously-rancid-tianna.ngrok-free.dev/api/";
     private static Retrofit retrofit = null;
 
     public static ApiService getApiService() {
