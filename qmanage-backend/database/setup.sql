@@ -1,11 +1,13 @@
 -- Qmanage Database Setup Script
 -- Run this in MySQL Workbench or MySQL CLI
+-- This script is idempotent: safe to run multiple times.
 
--- Create database
 CREATE DATABASE IF NOT EXISTS Qmanage;
 USE Qmanage;
 
 -- Users table
+-- Keep column name as `password` for current backend compatibility.
+-- Store only hashed passwords (e.g. bcrypt hash), never plain text.
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL DEFAULT '',
@@ -13,7 +15,8 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     phone VARCHAR(20) DEFAULT '',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_users_email (email)
 );
 
 -- Outlets table
@@ -21,12 +24,14 @@ CREATE TABLE IF NOT EXISTS outlets (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     categories VARCHAR(255) DEFAULT '',
-    rating FLOAT DEFAULT 0.0,
-    wait_time VARCHAR(50) DEFAULT '',
-    queue_count VARCHAR(50) DEFAULT '',
+    rating DECIMAL(2, 1) DEFAULT 0.0,
+    wait_time_minutes INT UNSIGNED DEFAULT 0,
+    queue_count INT UNSIGNED DEFAULT 0,
     image_url VARCHAR(500) DEFAULT '',
     is_open BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_outlets_name (name),
+    INDEX idx_outlets_open (is_open)
 );
 
 -- Menu items table
@@ -40,6 +45,9 @@ CREATE TABLE IF NOT EXISTS menu_items (
     image_url VARCHAR(500) DEFAULT '',
     is_available BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_menu_item_outlet_name (outlet_id, name),
+    INDEX idx_menu_items_outlet_id (outlet_id),
+    INDEX idx_menu_items_category (category),
     FOREIGN KEY (outlet_id) REFERENCES outlets(id) ON DELETE CASCADE
 );
 
@@ -50,9 +58,13 @@ CREATE TABLE IF NOT EXISTS orders (
     outlet_id INT NOT NULL,
     total_amount DECIMAL(10, 2) NOT NULL,
     status ENUM('Received', 'Preparing', 'Ready', 'Completed', 'Cancelled') DEFAULT 'Received',
-    token_number VARCHAR(20) DEFAULT '',
+    token_number VARCHAR(20) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_orders_token_number (token_number),
+    INDEX idx_orders_user_id (user_id),
+    INDEX idx_orders_outlet_id (outlet_id),
+    INDEX idx_orders_status (status),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (outlet_id) REFERENCES outlets(id) ON DELETE CASCADE
 );
@@ -62,38 +74,58 @@ CREATE TABLE IF NOT EXISTS order_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
     menu_item_id INT NOT NULL,
-    quantity INT NOT NULL DEFAULT 1,
+    quantity INT UNSIGNED NOT NULL DEFAULT 1,
     price DECIMAL(10, 2) NOT NULL,
+    UNIQUE KEY uk_order_item_unique (order_id, menu_item_id),
+    INDEX idx_order_items_order_id (order_id),
+    INDEX idx_order_items_menu_item_id (menu_item_id),
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
     FOREIGN KEY (menu_item_id) REFERENCES menu_items(id) ON DELETE CASCADE
 );
 
--- Insert sample outlets
-INSERT INTO outlets (name, categories, rating, wait_time, queue_count, image_url, is_open) VALUES
-('Campus Cafe', 'Coffee • Snacks • Beverages', 4.5, '5 mins wait', '3 in queue', '', true),
-('Food Court', 'Rolls • Indian • Fried', 4.2, '12 mins wait', '8 in queue', '', true),
-('Juice Bar', 'Juices • Smoothies • Shakes', 4.7, '3 mins wait', '2 in queue', '', true),
-('Quick Bites', 'Sandwiches • Burgers • Wraps', 4.0, '8 mins wait', '5 in queue', '', false);
+-- Insert/update sample outlets (idempotent)
+INSERT INTO outlets (
+    name, categories, rating, wait_time_minutes, queue_count, image_url, is_open
+) VALUES
+('Campus Cafe', 'Coffee • Snacks • Beverages', 4.5, 5, 3, '', true),
+('Food Court', 'Rolls • Indian • Fried', 4.2, 12, 8, '', true),
+('Juice Bar', 'Juices • Smoothies • Shakes', 4.7, 3, 2, '', true),
+('Quick Bites', 'Sandwiches • Burgers • Wraps', 4.0, 8, 5, '', false)
+ON DUPLICATE KEY UPDATE
+    categories = VALUES(categories),
+    rating = VALUES(rating),
+    wait_time_minutes = VALUES(wait_time_minutes),
+    queue_count = VALUES(queue_count),
+    image_url = VALUES(image_url),
+    is_open = VALUES(is_open);
 
--- Insert sample menu items
-INSERT INTO menu_items (outlet_id, name, description, price, category, image_url, is_available) VALUES
+-- Insert/update sample menu items (idempotent)
+INSERT INTO menu_items (
+    outlet_id, name, description, price, category, image_url, is_available
+) VALUES
 -- Campus Cafe items
-(1, 'Cappuccino', 'Rich and creamy cappuccino', 120.00, 'Beverages', '', true),
-(1, 'Latte', 'Smooth cafe latte', 140.00, 'Beverages', '', true),
-(1, 'Veg Sandwich', 'Fresh veggies with cheese', 80.00, 'Snacks', '', true),
-(1, 'Chocolate Muffin', 'Freshly baked chocolate muffin', 60.00, 'Snacks', '', true),
+((SELECT id FROM outlets WHERE name = 'Campus Cafe'), 'Cappuccino', 'Rich and creamy cappuccino', 120.00, 'Beverages', '', true),
+((SELECT id FROM outlets WHERE name = 'Campus Cafe'), 'Latte', 'Smooth cafe latte', 140.00, 'Beverages', '', true),
+((SELECT id FROM outlets WHERE name = 'Campus Cafe'), 'Veg Sandwich', 'Fresh veggies with cheese', 80.00, 'Snacks', '', true),
+((SELECT id FROM outlets WHERE name = 'Campus Cafe'), 'Chocolate Muffin', 'Freshly baked chocolate muffin', 60.00, 'Snacks', '', true),
 -- Food Court items
-(2, 'Paneer Roll', 'Spicy paneer stuffed roll', 100.00, 'Rolls', '', true),
-(2, 'Chicken Biryani', 'Aromatic chicken biryani', 180.00, 'Main Course', '', true),
-(2, 'Veg Thali', 'Complete veg meal', 150.00, 'Main Course', '', true),
-(2, 'French Fries', 'Crispy golden fries', 70.00, 'Sides & Extras', '', true),
+((SELECT id FROM outlets WHERE name = 'Food Court'), 'Paneer Roll', 'Spicy paneer stuffed roll', 100.00, 'Rolls', '', true),
+((SELECT id FROM outlets WHERE name = 'Food Court'), 'Chicken Biryani', 'Aromatic chicken biryani', 180.00, 'Main Course', '', true),
+((SELECT id FROM outlets WHERE name = 'Food Court'), 'Veg Thali', 'Complete veg meal', 150.00, 'Main Course', '', true),
+((SELECT id FROM outlets WHERE name = 'Food Court'), 'French Fries', 'Crispy golden fries', 70.00, 'Sides & Extras', '', true),
 -- Juice Bar items
-(3, 'Mango Smoothie', 'Fresh mango smoothie', 90.00, 'Smoothies', '', true),
-(3, 'Orange Juice', 'Freshly squeezed orange juice', 60.00, 'Juices', '', true),
-(3, 'Banana Shake', 'Creamy banana milkshake', 80.00, 'Shakes', '', true),
+((SELECT id FROM outlets WHERE name = 'Juice Bar'), 'Mango Smoothie', 'Fresh mango smoothie', 90.00, 'Smoothies', '', true),
+((SELECT id FROM outlets WHERE name = 'Juice Bar'), 'Orange Juice', 'Freshly squeezed orange juice', 60.00, 'Juices', '', true),
+((SELECT id FROM outlets WHERE name = 'Juice Bar'), 'Banana Shake', 'Creamy banana milkshake', 80.00, 'Shakes', '', true),
 -- Quick Bites items
-(4, 'Veg Burger', 'Classic veg burger with fries', 110.00, 'Burgers', '', true),
-(4, 'Chicken Wrap', 'Grilled chicken wrap', 130.00, 'Wraps', '', true),
-(4, 'Club Sandwich', 'Triple decker club sandwich', 150.00, 'Sandwiches', '', true);
+((SELECT id FROM outlets WHERE name = 'Quick Bites'), 'Veg Burger', 'Classic veg burger with fries', 110.00, 'Burgers', '', true),
+((SELECT id FROM outlets WHERE name = 'Quick Bites'), 'Chicken Wrap', 'Grilled chicken wrap', 130.00, 'Wraps', '', true),
+((SELECT id FROM outlets WHERE name = 'Quick Bites'), 'Club Sandwich', 'Triple decker club sandwich', 150.00, 'Sandwiches', '', true)
+ON DUPLICATE KEY UPDATE
+    description = VALUES(description),
+    price = VALUES(price),
+    category = VALUES(category),
+    image_url = VALUES(image_url),
+    is_available = VALUES(is_available);
 
 SELECT 'Database setup completed successfully!' AS status;
