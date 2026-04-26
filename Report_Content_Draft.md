@@ -135,82 +135,28 @@ The Orders tab at the bottom of the screen shows the student's full order histor
 
 ## FLOWCHART (INTERACTION DIAGRAM) OF THE APPLICATION
 
-The following flowchart describes the complete user journey through the QManage application, from the initial app launch all the way through to order confirmation and history viewing.
-
 ```mermaid
 flowchart TD
-    A([App Launched]) --> B{First Time\nUser?}
+    A([App Launch]) --> B[Splash Screen]
+    B --> C[Onboarding Screen]
+    C --> D[Login / Signup]
+    D --> E[Home Dashboard]
+    E --> F[Select Outlet]
+    F --> G[Browse Menu]
+    G --> H[Add Items to Cart]
+    H --> I[Cart Screen]
+    I --> J[Place Order]
+    J --> K[Order Confirmation\nToken: QM-XXXX]
+    K --> L[Order Tracking]
+    L --> M([Collect Food at Outlet])
 
-    B -- Yes --> C[Onboarding Screen\nSkip the Long Lines]
-    B -- No --> E{Session\nActive?}
+    E --> N[Orders Tab]
+    N --> O[View Order History]
 
-    C --> D[Login Screen]
-    E -- No --> D
-    E -- Yes --> H
-
-    D --> F{Has\nAccount?}
-    F -- No --> G[Signup Screen\nName · Email · Phone · Password]
-    G --> G1[POST /api/users/register]
-    G1 --> D
-
-    F -- Yes --> D1[Enter Email + Password]
-    D1 --> D2[POST /api/users/login]
-    D2 --> D3{Credentials\nValid?}
-    D3 -- No --> D4[Show Error Toast] --> D1
-    D3 -- Yes --> D5[Save Session\nSharedPreferences]
-    D5 --> H
-
-    H[Home Dashboard\nGET /api/outlets] --> I[Display Open Outlets\nSorted by Status · Rating]
-
-    I --> J{Use Filter\nChip?}
-    J -- Yes --> K[Filter Outlets by Category\nBurgers · Pizza · Healthy]
-    K --> L[Tap Outlet Card]
-    J -- No --> L
-
-    L --> M[Outlet Menu Screen\nGET /api/outlets/id/menu]
-    M --> N[Display Available Menu Items]
-
-    N --> O[Tap ADD on Item]
-    O --> P{Cart from\nSame Outlet?}
-    P -- No --> Q[Clear Cart\nAdd New Item]
-    P -- Yes --> R[Increment Quantity\nor Add New Item]
-    Q --> S
-    R --> S[Cart Bar Updates\nItem Count + Subtotal]
-
-    S --> T{Continue\nShopping?}
-    T -- Yes --> N
-    T -- No --> U[Tap View Cart]
-
-    U --> V[Cart Screen\nReview Items + Adjust Qty]
-    V --> W{Remove\nor Adjust?}
-    W -- Yes --> V
-    W -- No --> X[Tap Place Order\nPOST /api/orders]
-
-    X --> Y{API\nSuccess?}
-    Y -- No --> Z[Show Network Error\nToast] --> V
-    Y -- Yes --> AA[Order Confirmation Screen\nToken Number: QM-XXXX]
-
-    AA --> AB[Tap Track Order]
-    AB --> AC[Order Tracking Screen\nReceived → Preparing → Ready]
-
-    AC --> AD[Visit Outlet\nShow Token · Collect Food]
-
-    AD --> AE[Bottom Nav: Orders Tab\nGET /api/orders/user/id]
-    AE --> AF[View Full Order History\nOutlet · Date · Status · Amount]
-
-    AF --> AG{Tap\nOrder?}
-    AG -- Yes --> AC
-    AG -- No --> H
+    E --> P[Account Tab]
+    P --> Q[View Profile / Logout]
 
     style A fill:#F59E0B,color:#fff
-    style AA fill:#10B981,color:#fff
-    style D4 fill:#EF4444,color:#fff
-    style Z fill:#EF4444,color:#fff
-    style AD fill:#3B82F6,color:#fff
+    style K fill:#10B981,color:#fff
+    style M fill:#3B82F6,color:#fff
 ```
-
-### Flowchart Description
-
-The interaction flow begins when the user launches the app. If it is the user's first time opening the application, they are shown the Onboarding screen, after which they are directed to the Login screen. On subsequent launches, the app checks the `SharedPreferences`-backed `SessionManager` — if a session already exists, the user is taken directly to the Home Dashboard, bypassing Login entirely.
-
-From the Home Dashboard, live outlet data is fetched from the backend. The user can apply category filters and tap on any outlet to open its menu. Items are added to the cart, which is managed by the global `CartManager` Singleton. The cart enforces a one-outlet-per-cart rule throughout. Once the user is satisfied with their selection, they proceed to the Cart screen, review their order, and tap "Place Order." A POST request is sent to the backend, which processes the order in a database transaction and returns a unique token number. The Order Confirmation screen displays this token prominently. The user can then track their order status and, once ready, visit the outlet counter with the token to collect their food. The Orders tab provides a complete history of all past transactions for the logged-in user.
