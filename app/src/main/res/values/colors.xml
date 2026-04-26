@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Primary brand colors -->
+    <color name="primary">#F59E0B</color>
+    <color name="primary_dark">#D97706</color>
+    <color name="primary_light">#FCD34D</color>
+    <color name="primary_variant">#FBBF24</color>
+
+    <!-- Accent / Secondary -->
+    <color name="secondary">#1F2937</color>
+    <color name="secondary_light">#374151</color>
+
+    <!-- Background colors -->
+    <color name="background_dark">#1A1A2E</color>
+    <color name="background_light">#FFFFFF</color>
+    <color name="surface_light">#F9FAFB</color>
+    <color name="card_background">#FFFFFF</color>
+
+    <!-- Text colors -->
+    <color name="text_primary">#1F2937</color>
+    <color name="text_secondary">#6B7280</color>
+    <color name="text_hint">#9CA3AF</color>
+    <color name="text_on_primary">#FFFFFF</color>
+
+    <!-- Status colors -->
+    <color name="success">#10B981</color>
+    <color name="error">#EF4444</color>
+    <color name="warning">#F59E0B</color>
+    <color name="info">#3B82F6</color>
+
+    <!-- Border / Divider -->
+    <color name="divider">#E5E7EB</color>
+    <color name="border">#D1D5DB</color>
+
+    <!-- Splash screen -->
+    <color name="splash_background">#1A1A2E</color>
+
+    <!-- Rating star -->
+    <color name="star_yellow">#FBBF24</color>
+
+    <!-- Open badge -->
+    <color name="open_badge">#10B981</color>
+    <color name="open_badge_bg">#D1FAE5</color>
+
+    <!-- Chip colors -->
+    <color name="chip_selected_bg">#F59E0B</color>
+    <color name="chip_selected_text">#FFFFFF</color>
+    <color name="chip_unselected_bg">#F3F4F6</color>
+    <color name="chip_unselected_text">#6B7280</color>
+
+    <!-- Order status colors -->
+    <color name="status_received">#10B981</color>
+    <color name="status_preparing">#F59E0B</color>
+    <color name="status_ready">#D1D5DB</color>
+    <color name="status_line_active">#F59E0B</color>
+    <color name="status_line_inactive">#E5E7EB</color>
+
+    <!-- Bottom nav -->
+    <color name="bottom_nav_active">#F59E0B</color>
+    <color name="bottom_nav_inactive">#9CA3AF</color>
+</resources>
