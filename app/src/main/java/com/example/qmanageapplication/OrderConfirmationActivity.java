@@ -31,10 +31,12 @@ public class OrderConfirmationActivity extends AppCompatActivity {
         tvPrepTime.setText(prepTime + " mins");
 
         // Track Order button
+        int orderId = getIntent().getIntExtra("order_id", -1);
         String finalToken = token;
         MaterialButton btnTrackOrder = findViewById(R.id.btnTrackOrder);
         btnTrackOrder.setOnClickListener(v -> {
             Intent intent = new Intent(OrderConfirmationActivity.this, OrderTrackingActivity.class);
+            intent.putExtra("order_id", orderId);
             intent.putExtra("token_number", finalToken);
             intent.putExtra("prep_time", prepTime);
             startActivity(intent);

@@ -5,6 +5,7 @@ import com.example.qmanageapplication.network.responses.OrderResponse;
 import com.example.qmanageapplication.network.responses.OrderListResponse;
 import com.example.qmanageapplication.network.responses.OutletResponse;
 import com.example.qmanageapplication.network.responses.MenuResponse;
+import com.example.qmanageapplication.network.responses.SingleOrderResponse;
 import com.example.qmanageapplication.network.UserRequest;
 import com.example.qmanageapplication.network.OrderRequest;
 
@@ -33,4 +34,7 @@ public interface ApiService {
 
     @GET("orders/user/{userId}")
     Call<OrderListResponse> getUserOrders(@Path("userId") int userId);
+
+    @GET("orders/{orderId}")
+    Call<SingleOrderResponse> getOrderById(@Path("orderId") int orderId);
 }

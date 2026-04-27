@@ -94,6 +94,7 @@ public class CartActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<OrderResponse> call, @NonNull Response<OrderResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     Intent intent = new Intent(CartActivity.this, OrderConfirmationActivity.class);
+                    intent.putExtra("order_id", response.body().getOrderId());
                     intent.putExtra("token_number", response.body().getTokenNumber());
                     startActivity(intent);
                     CartManager.getInstance().clearCart();
