@@ -68,4 +68,41 @@ const getUserOrders = async (req, res) => {
     }
 };
 
-module.exports = { placeOrder, getUserOrders };
+// GET /api/orders/outlet/:outletId
+const getOutletOrders = async (req, res) => {
+    try {
+        const { outletId } = req.params;
+        const [orders] = await db.query(
+            `SELECT o.*, u.name as userName 
+             FROM orders o 
+             JOIN users u ON o.user_id = u.id 
+             WHERE o.outlet_id = ? 
+             ORDER BY o.created_at DESC`,
+            [outletId]
+        );
+        res.json({ success: true, orders });
+    } catch (error) {
+        console.error('Get Outlet Orders Error:', error.message);
+        res.status(500).json({ success: false, message: 'Error fetching orders' });
+    }
+};
+
+// PATCH /api/orders/:orderId/status
+const updateOrderStatus = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const { status } = req.body; // 'received', 'preparing', 'ready', 'completed'
+
+        await db.query(
+            'UPDATE orders SET status = ? WHERE id = ?',
+            [status, orderId]
+        );
+
+        res.json({ success: true, message: 'Order status updated' });
+    } catch (error) {
+        console.error('Update Order Status Error:', error.message);
+        res.status(500).json({ success: false, message: 'Error updating status' });
+    }
+};
+
+module.exports = { placeOrder, getUserOrders, getOutletOrders, updateOrderStatus };

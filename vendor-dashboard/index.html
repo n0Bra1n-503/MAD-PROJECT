@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QManage | Vendor Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-bolt"></i>
+                <span>QManage</span>
+            </div>
+            <nav>
+                <ul>
+                    <li class="active" data-view="dashboard">
+                        <i class="fas fa-th-large"></i> Dashboard
+                    </li>
+                    <li data-view="orders">
+                        <i class="fas fa-shopping-bag"></i> Orders
+                    </li>
+                    <li data-view="menu">
+                        <i class="fas fa-utensils"></i> Menu
+                    </li>
+                    <li data-view="settings">
+                        <i class="fas fa-cog"></i> Settings
+                    </li>
+                </ul>
+            </nav>
+            <div class="outlet-status">
+                <div class="status-label">Outlet Status</div>
+                <label class="switch">
+                    <input type="checkbox" id="outletStatusToggle" checked>
+                    <span class="slider round"></span>
+                </label>
+                <span id="statusText">Open</span>
+            </div>
+            <div class="logout-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h1 id="viewTitle">Dashboard</h1>
+                <div class="user-profile">
+                    <span id="outletName">Campus Cafe</span>
+                    <div class="avatar">C</div>
+                </div>
+            </header>
+
+            <!-- Dashboard View -->
+            <section id="dashboardView" class="view">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon orange"><i class="fas fa-coins"></i></div>
+                        <div class="stat-info">
+                            <h3>Today's Revenue</h3>
+                            <p id="totalRevenue">Rs. 0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon blue"><i class="fas fa-clipboard-list"></i></div>
+                        <div class="stat-info">
+                            <h3>Total Orders</h3>
+                            <p id="totalOrders">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green"><i class="fas fa-clock"></i></div>
+                        <div class="stat-info">
+                            <h3>Pending Orders</h3>
+                            <p id="pendingOrders">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-orders-section">
+                    <div class="section-header">
+                        <h2>Active Queue</h2>
+                        <button class="btn btn-secondary" onclick="fetchOrders()">Refresh</button>
+                    </div>
+                    <div class="orders-table-container">
+                        <table id="activeQueueTable">
+                            <thead>
+                                <tr>
+                                    <th>Token</th>
+                                    <th>Customer</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Orders will be injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Orders View -->
+            <section id="ordersView" class="view" style="display: none;">
+                <h2>Order Management</h2>
+                <!-- Similar table for all orders -->
+            </section>
+
+            <!-- Menu View -->
+            <section id="menuView" class="view" style="display: none;">
+                <div class="section-header">
+                    <h2>Menu Management</h2>
+                    <button class="btn btn-primary" onclick="showAddItemModal()">+ Add Item</button>
+                </div>
+                <div class="menu-grid" id="menuItemsGrid">
+                    <!-- Menu items will be injected here -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="addItemModal" class="modal">
+        <div class="modal-content">
+            <h3>Add New Item</h3>
+            <form id="addItemForm">
+                <div class="form-group">
+                    <label>Item Name</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Price (Rs.)</label>
+                        <input type="number" name="price" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select name="isVeg">
+                            <option value="1">Veg</option>
+                            <option value="0">Non-Veg</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="hideAddItemModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
