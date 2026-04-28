@@ -2,7 +2,6 @@ const db = require('../config/db');
 
 // POST /api/orders
 const placeOrder = async (req, res) => {
-    let connection;
     try {
         const { userId, outletId, totalAmount, items } = req.body;
 
@@ -13,26 +12,23 @@ const placeOrder = async (req, res) => {
         // Generate a simple token number (e.g., QM-1234)
         const tokenNumber = 'QM-' + Math.floor(1000 + Math.random() * 9000);
 
-        // Start transaction
-        connection = await db.getConnection();
-        await connection.beginTransaction();
-
-        // 1. Insert into orders table
-        const [orderResult] = await connection.query(
-            'INSERT INTO orders (user_id, outlet_id, total_amount, token_number) VALUES (?, ?, ?, ?)',
+        // Call the stored procedure (demonstrating Stored Procedures, Transactions, and ACID)
+        await db.query(
+            'CALL sp_place_order(?, ?, ?, ?, @p_order_id)',
             [userId, outletId, totalAmount, tokenNumber]
         );
-        const orderId = orderResult.insertId;
+
+        // Get the order ID returned by the procedure
+        const [[{ orderId }]] = await db.query('SELECT @p_order_id AS orderId');
 
         // 2. Insert items into order_items table
         for (const item of items) {
-            await connection.query(
+            await db.query(
                 'INSERT INTO order_items (order_id, menu_item_id, quantity, price) VALUES (?, ?, ?, ?)',
                 [orderId, item.menuItemId, item.quantity, item.price]
             );
         }
 
-        await connection.commit();
         res.status(201).json({
             success: true,
             message: 'Order placed successfully',
@@ -41,11 +37,8 @@ const placeOrder = async (req, res) => {
         });
 
     } catch (error) {
-        if (connection) await connection.rollback();
         console.error('Place Order Error:', error.message);
         res.status(500).json({ success: false, message: 'Error placing order' });
-    } finally {
-        if (connection) connection.release();
     }
 };
 
@@ -53,8 +46,10 @@ const placeOrder = async (req, res) => {
 const getUserOrders = async (req, res) => {
     try {
         const { userId } = req.params;
+        // Demonstrating SUBQUERIES: Finding total item count for each order
         const [orders] = await db.query(
-            `SELECT o.*, ot.name as outletName, ot.image_url as outletImage 
+            `SELECT o.*, ot.name as outletName, ot.image_url as outletImage,
+             (SELECT SUM(quantity) FROM order_items WHERE order_id = o.id) as totalItems
              FROM orders o 
              JOIN outlets ot ON o.outlet_id = ot.id 
              WHERE o.user_id = ? 
@@ -72,12 +67,9 @@ const getUserOrders = async (req, res) => {
 const getOutletOrders = async (req, res) => {
     try {
         const { outletId } = req.params;
+        // Demonstrating VIEWS: Using the pre-defined view_order_details
         const [orders] = await db.query(
-            `SELECT o.*, u.name as userName 
-             FROM orders o 
-             JOIN users u ON o.user_id = u.id 
-             WHERE o.outlet_id = ? 
-             ORDER BY o.created_at DESC`,
+            'SELECT * FROM view_order_details WHERE outlet_id = ? ORDER BY created_at DESC',
             [outletId]
         );
         res.json({ success: true, orders });

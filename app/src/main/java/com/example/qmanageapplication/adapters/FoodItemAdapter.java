@@ -9,8 +9,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.qmanageapplication.R;
 import com.example.qmanageapplication.models.FoodItem;
+import com.example.qmanageapplication.network.ApiClient;
 
 import java.util.List;
 import java.util.Locale;
@@ -81,13 +83,21 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodVi
             tvFoodDescription.setText(item.getDescription());
             tvFoodPrice.setText(String.format(Locale.getDefault(), "Rs. %.0f", item.getPrice()));
 
-            // Load image dynamically by resource name
-            int resId = itemView.getContext().getResources().getIdentifier(
-                    item.getImageResName(), "drawable", itemView.getContext().getPackageName());
-            if (resId != 0) {
-                imgFood.setImageResource(resId);
+            String imageUrl = item.getImageUrl();
+            if (imageUrl != null && !imageUrl.isEmpty()) {
+                String fullUrl = ApiClient.BASE_URL.replace("/api/", "") + imageUrl;
+                Glide.with(itemView.getContext())
+                        .load(fullUrl)
+                        .placeholder(R.drawable.placeholder_food)
+                        .into(imgFood);
             } else {
-                imgFood.setImageResource(R.drawable.placeholder_food);
+                int resId = itemView.getContext().getResources().getIdentifier(
+                        item.getImageResName(), "drawable", itemView.getContext().getPackageName());
+                if (resId != 0) {
+                    imgFood.setImageResource(resId);
+                } else {
+                    imgFood.setImageResource(R.drawable.placeholder_food);
+                }
             }
         }
     }

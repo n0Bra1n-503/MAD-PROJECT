@@ -9,8 +9,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.qmanageapplication.R;
 import com.example.qmanageapplication.models.Outlet;
+import com.example.qmanageapplication.network.ApiClient;
 
 import java.util.List;
 
@@ -75,13 +77,24 @@ public class OutletAdapter extends RecyclerView.Adapter<OutletAdapter.OutletView
         }
 
         void bind(Outlet outlet) {
-            // Load image dynamically by resource name
-            int resId = itemView.getContext().getResources().getIdentifier(
-                    outlet.getImageResName(), "drawable", itemView.getContext().getPackageName());
-            if (resId != 0) {
-                imgOutlet.setImageResource(resId);
+            String imageUrl = outlet.getImageUrl();
+            
+            if (imageUrl != null && !imageUrl.isEmpty()) {
+                // Prepend base URL for images (removing /api/ suffix)
+                String fullUrl = ApiClient.BASE_URL.replace("/api/", "") + imageUrl;
+                Glide.with(itemView.getContext())
+                        .load(fullUrl)
+                        .placeholder(R.drawable.placeholder_food)
+                        .into(imgOutlet);
             } else {
-                imgOutlet.setImageResource(R.drawable.placeholder_food);
+                // Fallback to resource-based images
+                int resId = itemView.getContext().getResources().getIdentifier(
+                        outlet.getImageResName(), "drawable", itemView.getContext().getPackageName());
+                if (resId != 0) {
+                    imgOutlet.setImageResource(resId);
+                } else {
+                    imgOutlet.setImageResource(R.drawable.placeholder_food);
+                }
             }
 
             tvOutletName.setText(outlet.getName());

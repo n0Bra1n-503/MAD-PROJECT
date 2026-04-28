@@ -155,7 +155,11 @@ function renderMenu() {
     menuItems.forEach(item => {
         const div = document.createElement('div');
         div.className = 'menu-item-card';
+        // Get full URL if it's a relative path
+        const imgUrl = item.image_url ? (item.image_url.startsWith('http') ? item.image_url : `${API_BASE_URL.replace('/api', '')}${item.image_url}`) : 'https://via.placeholder.com/150';
+        
         div.innerHTML = `
+            <img src="${imgUrl}" alt="${item.name}" class="item-img" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
             <div class="item-info">
                 <h4>${item.name} ${item.is_veg ? '🟢' : '🔴'}</h4>
                 <p>${item.description}</p>

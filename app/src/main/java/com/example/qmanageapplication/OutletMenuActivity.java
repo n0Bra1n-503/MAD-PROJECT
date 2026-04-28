@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.bumptech.glide.Glide;
 
 import com.example.qmanageapplication.adapters.FoodItemAdapter;
 import com.example.qmanageapplication.models.CartManager;
@@ -62,6 +63,24 @@ public class OutletMenuActivity extends AppCompatActivity implements FoodItemAda
         tvOutletName.setText(outletName != null ? outletName : "Kathi Junction");
         tvOutletSubtitle.setText(outletCategories != null ? outletCategories : "Exquisite Rolls");
         tvRating.setText(String.format(Locale.getDefault(), "%.1f (500+)", outletRating));
+
+        // Set outlet banner image
+        ImageView imgBanner = findViewById(R.id.imgBanner);
+        String outletImageUrl = getIntent().getStringExtra("outlet_image_url");
+        String outletImageRes = getIntent().getStringExtra("outlet_image_res");
+
+        if (outletImageUrl != null && !outletImageUrl.isEmpty()) {
+            String fullUrl = ApiClient.BASE_URL.replace("/api/", "") + outletImageUrl;
+            Glide.with(this)
+                    .load(fullUrl)
+                    .placeholder(R.drawable.placeholder_outlet_banner)
+                    .into(imgBanner);
+        } else if (outletImageRes != null) {
+            int resId = getResources().getIdentifier(outletImageRes, "drawable", getPackageName());
+            if (resId != 0) {
+                imgBanner.setImageResource(resId);
+            }
+        }
 
         // Back button
         ImageView btnBack = findViewById(R.id.btnBack);

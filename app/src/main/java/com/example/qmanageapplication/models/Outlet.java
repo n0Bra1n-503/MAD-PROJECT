@@ -17,11 +17,14 @@ public class Outlet {
     @SerializedName("image_res_name")
     private String imageResName;
 
+    @SerializedName("image_url")
+    private String imageUrl;
+
     @SerializedName("is_open")
     private boolean isOpen;
 
     public Outlet(int id, String name, String categories, float rating, int waitTimeMinutes,
-                  int queueCount, String imageResName, boolean isOpen) {
+                  int queueCount, String imageResName, String imageUrl, boolean isOpen) {
         this.id = id;
         this.name = name;
         this.categories = categories;
@@ -29,6 +32,7 @@ public class Outlet {
         this.waitTimeMinutes = waitTimeMinutes;
         this.queueCount = queueCount;
         this.imageResName = imageResName;
+        this.imageUrl = imageUrl;
         this.isOpen = isOpen;
     }
 
@@ -39,6 +43,7 @@ public class Outlet {
     public int getWaitTimeMinutes() { return waitTimeMinutes; }
     public int getQueueCount() { return queueCount; }
     public String getImageResName() { return imageResName; }
+    public String getImageUrl() { return imageUrl; }
     public boolean isOpen() { return isOpen; }
 
     // Helper for display

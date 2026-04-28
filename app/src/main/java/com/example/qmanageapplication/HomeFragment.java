@@ -144,6 +144,8 @@ public class HomeFragment extends Fragment implements OutletAdapter.OnOutletClic
         intent.putExtra("outlet_name", outlet.getName());
         intent.putExtra("outlet_categories", outlet.getCategories());
         intent.putExtra("outlet_rating", outlet.getRating());
+        intent.putExtra("outlet_image_url", outlet.getImageUrl());
+        intent.putExtra("outlet_image_res", outlet.getImageResName());
         startActivity(intent);
     }
 }

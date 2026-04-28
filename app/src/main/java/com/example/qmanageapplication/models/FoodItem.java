@@ -15,6 +15,9 @@ public class FoodItem {
     @SerializedName("image_res_name")
     private String imageResName;
 
+    @SerializedName("image_url")
+    private String imageUrl;
+
     @SerializedName("is_available")
     private boolean isAvailable;
 
@@ -22,7 +25,7 @@ public class FoodItem {
     private int outletId;
 
     public FoodItem(int id, String name, String description, double price, String category,
-                    boolean isVeg, String imageResName, boolean isAvailable) {
+                    boolean isVeg, String imageResName, String imageUrl, boolean isAvailable) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -30,6 +33,7 @@ public class FoodItem {
         this.category = category;
         this.isVeg = isVeg;
         this.imageResName = imageResName;
+        this.imageUrl = imageUrl;
         this.isAvailable = isAvailable;
     }
 
@@ -40,6 +44,7 @@ public class FoodItem {
     public String getCategory() { return category; }
     public boolean isVeg() { return isVeg; }
     public String getImageResName() { return imageResName; }
+    public String getImageUrl() { return imageUrl; }
     public boolean isAvailable() { return isAvailable; }
     public int getOutletId() { return outletId; }
 }

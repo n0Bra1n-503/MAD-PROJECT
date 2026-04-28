@@ -3,7 +3,14 @@ const db = require('../config/db');
 // GET /api/outlets
 const getAllOutlets = async (req, res) => {
     try {
-        const [outlets] = await db.query('SELECT * FROM outlets ORDER BY is_open DESC, rating DESC');
+        const [outlets] = await db.query(`
+            SELECT ot.*, COALESCE(GROUP_CONCAT(c.name SEPARATOR ' • '), '') AS categories 
+            FROM outlets ot 
+            LEFT JOIN outlet_categories oc ON ot.id = oc.outlet_id 
+            LEFT JOIN categories c ON oc.category_id = c.id 
+            GROUP BY ot.id 
+            ORDER BY ot.is_open DESC, ot.rating DESC
+        `);
         res.json({ success: true, outlets });
     } catch (error) {
         console.error('Get Outlets Error:', error.message);
@@ -16,7 +23,9 @@ const getOutletMenu = async (req, res) => {
     try {
         const { id } = req.params;
         const [menuItems] = await db.query(
-            'SELECT * FROM menu_items WHERE outlet_id = ? AND is_available = true',
+            `SELECT *, fn_calculate_discount(price, 10) as discountedPrice 
+             FROM menu_items 
+             WHERE outlet_id = ? AND is_available = true`,
             [id]
         );
         res.json({ success: true, menuItems });
