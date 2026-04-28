@@ -48,8 +48,63 @@ document.querySelectorAll('.sidebar li').forEach(li => {
         
         if (viewId === 'menu') fetchMenu();
         if (viewId === 'dashboard') fetchOrders();
+        if (viewId === 'analytics') fetchAnalytics();
+        if (viewId === 'reviews') fetchReviews();
     });
 });
+
+// Fetch Analytics
+async function fetchAnalytics() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/vendors/performance/${OUTLET_ID}`);
+        const data = await response.json();
+        if (data.success) {
+            const p = data.performance;
+            document.getElementById('lifetimeRevenue').textContent = `Rs. ${parseFloat(p.revenue || 0).toFixed(0)}`;
+            document.getElementById('lifetimeOrders').textContent = p.total_orders || 0;
+            document.getElementById('avgRating').textContent = parseFloat(p.avg_rating || 0).toFixed(1);
+        }
+    } catch (error) {
+        console.error('Fetch Analytics Error:', error);
+    }
+}
+
+// Fetch Reviews
+async function fetchReviews() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/reviews/outlet/${OUTLET_ID}`);
+        const data = await response.json();
+        if (data.success) {
+            renderReviews(data.reviews);
+        }
+    } catch (error) {
+        console.error('Fetch Reviews Error:', error);
+    }
+}
+
+// Render Reviews
+function renderReviews(reviews) {
+    const container = document.getElementById('reviewsContainer');
+    container.innerHTML = '';
+    if (reviews.length === 0) {
+        container.innerHTML = '<div style="text-align: center; padding: 40px; color: #64748B;">No reviews yet.</div>';
+        return;
+    }
+    reviews.forEach(review => {
+        const div = document.createElement('div');
+        div.style.cssText = 'background: white; padding: 20px; border-radius: 12px; margin-bottom: 16px; border: 1px solid #E2E8F0;';
+        div.innerHTML = `
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <strong style="color: #1E293B;">${review.userName}</strong>
+                <span style="color: #F59E0B;">${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}</span>
+            </div>
+            <p style="color: #64748B; font-size: 0.95rem; line-height: 1.5;">${review.comment || 'No comment provided.'}</p>
+            <div style="font-size: 0.8rem; color: #94A3B8; margin-top: 12px;">${new Date(review.created_at).toLocaleDateString()}</div>
+        `;
+        container.appendChild(div);
+    });
+}
+
 
 // Fetch Orders
 async function fetchOrders() {

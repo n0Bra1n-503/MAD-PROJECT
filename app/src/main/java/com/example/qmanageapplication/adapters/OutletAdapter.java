@@ -103,7 +103,10 @@ public class OutletAdapter extends RecyclerView.Adapter<OutletAdapter.OutletView
             tvQueueCount.setText(outlet.getQueueCountDisplay());
             tvCategories.setText(outlet.getCategories());
 
-            tvOpenBadge.setVisibility(outlet.isOpen() ? View.VISIBLE : View.GONE);
+            tvOpenBadge.setText(outlet.isOpen() ? "OPEN" : "CLOSED");
+            tvOpenBadge.setBackgroundResource(outlet.isOpen() ? R.drawable.bg_badge_open : R.drawable.bg_badge_closed);
+            tvOpenBadge.setTextColor(itemView.getContext().getResources().getColor(R.color.white, null));
+            tvOpenBadge.setVisibility(View.VISIBLE);
         }
     }
 }

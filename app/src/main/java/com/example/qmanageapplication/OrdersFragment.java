@@ -88,10 +88,19 @@ public class OrdersFragment extends Fragment implements OrderAdapter.OnOrderClic
 
     @Override
     public void onOrderClick(Order order, int position) {
-        Intent intent = new Intent(getActivity(), OrderTrackingActivity.class);
-        intent.putExtra("order_id", order.getOrderId());
-        intent.putExtra("token_number", order.getTokenNumber());
-        intent.putExtra("prep_time", 8);
-        startActivity(intent);
+        if ("Completed".equalsIgnoreCase(order.getStatus())) {
+            Intent intent = new Intent(getActivity(), ReviewActivity.class);
+            intent.putExtra("order_id", order.getOrderId());
+            intent.putExtra("outlet_id", order.getOutletId());
+            intent.putExtra("outlet_name", order.getOutletName());
+            startActivity(intent);
+        } else {
+            Intent intent = new Intent(getActivity(), OrderTrackingActivity.class);
+            intent.putExtra("order_id", order.getOrderId());
+            intent.putExtra("token_number", order.getTokenNumber());
+            intent.putExtra("prep_time", 8);
+            startActivity(intent);
+        }
     }
+
 }

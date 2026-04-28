@@ -21,6 +21,8 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodVi
 
     private List<FoodItem> foodItems;
     private final OnAddClickListener listener;
+    private boolean isOutletOpen = true;
+
 
     public interface OnAddClickListener {
         void onAddClick(FoodItem foodItem, int position);
@@ -35,6 +37,12 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodVi
         this.foodItems = newList;
         notifyDataSetChanged();
     }
+
+    public void setOutletOpen(boolean open) {
+        this.isOutletOpen = open;
+        notifyDataSetChanged();
+    }
+
 
     @NonNull
     @Override
@@ -83,6 +91,15 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodVi
             tvFoodDescription.setText(item.getDescription());
             tvFoodPrice.setText(String.format(Locale.getDefault(), "Rs. %.0f", item.getPrice()));
 
+            if (isOutletOpen) {
+                btnAdd.setVisibility(View.VISIBLE);
+                btnAdd.setEnabled(true);
+            } else {
+                btnAdd.setVisibility(View.INVISIBLE);
+                btnAdd.setEnabled(false);
+            }
+
+
             String imageUrl = item.getImageUrl();
             if (imageUrl != null && !imageUrl.isEmpty()) {
                 String fullUrl = ApiClient.BASE_URL.replace("/api/", "") + imageUrl;
@@ -90,7 +107,7 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodVi
                         .load(fullUrl)
                         .placeholder(R.drawable.placeholder_food)
                         .into(imgFood);
-            } else {
+            } else if (item.getImageResName() != null) {
                 int resId = itemView.getContext().getResources().getIdentifier(
                         item.getImageResName(), "drawable", itemView.getContext().getPackageName());
                 if (resId != 0) {
@@ -98,7 +115,10 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodVi
                 } else {
                     imgFood.setImageResource(R.drawable.placeholder_food);
                 }
+            } else {
+                imgFood.setImageResource(R.drawable.placeholder_food);
             }
+
         }
     }
 }

@@ -37,4 +37,28 @@ const login = async (req, res) => {
     }
 };
 
-module.exports = { login };
+// GET /api/vendors/performance/:id
+const getPerformance = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const [rows] = await db.query(
+            'SELECT * FROM view_outlet_performance WHERE name = (SELECT name FROM outlets WHERE id = ?)',
+            [id]
+        );
+
+        if (rows.length === 0) {
+            return res.json({ 
+                success: true, 
+                performance: { total_orders: 0, avg_rating: 0, revenue: 0 } 
+            });
+        }
+
+        res.json({ success: true, performance: rows[0] });
+    } catch (error) {
+        console.error('Get Performance Error:', error.message);
+        res.status(500).json({ success: false, message: 'Error fetching performance' });
+    }
+};
+
+module.exports = { login, getPerformance };
+

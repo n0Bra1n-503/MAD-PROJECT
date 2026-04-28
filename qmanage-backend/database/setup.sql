@@ -243,6 +243,11 @@ BEGIN
     -- START TRANSACTION
     START TRANSACTION;
 
+    -- 0. Check if outlet is open
+    IF (SELECT is_open FROM outlets WHERE id = p_outlet_id) = FALSE THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'This outlet is currently closed.';
+    END IF;
+
     -- 1. Insert Order
     INSERT INTO orders (user_id, outlet_id, total_amount, token_number)
     VALUES (p_user_id, p_outlet_id, p_total_amount, p_token_number);
@@ -257,6 +262,7 @@ BEGIN
     -- COMMIT if everything is fine
     COMMIT;
 END //
+
 DELIMITER ;
 
 SELECT '✅ Database setup completed successfully!' AS status;

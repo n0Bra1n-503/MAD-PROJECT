@@ -42,6 +42,8 @@ public class OutletMenuActivity extends AppCompatActivity implements FoodItemAda
     private TextView selectedTab;
     private ProgressBar progressBar;
     private int outletId;
+    private boolean isOutletOpen = true;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +55,8 @@ public class OutletMenuActivity extends AppCompatActivity implements FoodItemAda
         String outletName = getIntent().getStringExtra("outlet_name");
         String outletCategories = getIntent().getStringExtra("outlet_categories");
         float outletRating = getIntent().getFloatExtra("outlet_rating", 4.5f);
+        isOutletOpen = getIntent().getBooleanExtra("is_open", true);
+
 
         // Set outlet info
         TextView tvOutletName = findViewById(R.id.tvOutletName);
@@ -108,8 +112,10 @@ public class OutletMenuActivity extends AppCompatActivity implements FoodItemAda
         // Food items
         rvFoodItems = findViewById(R.id.rvFoodItems);
         foodItemAdapter = new FoodItemAdapter(allFoodItems, this);
+        foodItemAdapter.setOutletOpen(isOutletOpen);
         rvFoodItems.setLayoutManager(new LinearLayoutManager(this));
         rvFoodItems.setAdapter(foodItemAdapter);
+
 
         if (outletId != -1) {
             fetchMenu();
@@ -118,7 +124,12 @@ public class OutletMenuActivity extends AppCompatActivity implements FoodItemAda
         }
 
         updateCartBar();
+
+        if (!isOutletOpen) {
+            Toast.makeText(this, "This outlet is currently closed. You cannot place orders.", Toast.LENGTH_LONG).show();
+        }
     }
+
 
     private void fetchMenu() {
         if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
@@ -175,10 +186,11 @@ public class OutletMenuActivity extends AppCompatActivity implements FoodItemAda
         } else {
             List<FoodItem> filtered = new ArrayList<>();
             for (FoodItem item : allFoodItems) {
-                if (item.getCategory().equalsIgnoreCase(category)) {
+                if (item.getCategory() != null && item.getCategory().equalsIgnoreCase(category)) {
                     filtered.add(item);
                 }
             }
+
             foodItemAdapter.updateList(filtered);
         }
     }

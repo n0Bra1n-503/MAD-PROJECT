@@ -27,9 +27,16 @@
                     <li data-view="menu">
                         <i class="fas fa-utensils"></i> Menu
                     </li>
+                    <li data-view="analytics">
+                        <i class="fas fa-chart-line"></i> Analytics
+                    </li>
+                    <li data-view="reviews">
+                        <i class="fas fa-star"></i> Reviews
+                    </li>
                     <li data-view="settings">
                         <i class="fas fa-cog"></i> Settings
                     </li>
+
                 </ul>
             </nav>
             <div class="outlet-status">
@@ -121,6 +128,42 @@
                     <!-- Menu items will be injected here -->
                 </div>
             </section>
+
+            <!-- Analytics View -->
+            <section id="analyticsView" class="view" style="display: none;">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon purple"><i class="fas fa-chart-pie"></i></div>
+                        <div class="stat-info">
+                            <h3>Lifetime Revenue</h3>
+                            <p id="lifetimeRevenue">Rs. 0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange"><i class="fas fa-shopping-cart"></i></div>
+                        <div class="stat-info">
+                            <h3>Total Lifetime Orders</h3>
+                            <p id="lifetimeOrders">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon yellow"><i class="fas fa-star"></i></div>
+                        <div class="stat-info">
+                            <h3>Average Rating</h3>
+                            <p id="avgRating">0.0</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reviews View -->
+            <section id="reviewsView" class="view" style="display: none;">
+                <h2>Customer Feedback</h2>
+                <div id="reviewsContainer" style="margin-top: 20px;">
+                    <!-- Reviews will be injected here -->
+                </div>
+            </section>
+
         </main>
     </div>
 

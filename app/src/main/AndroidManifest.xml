@@ -69,6 +69,12 @@
             android:name=".OrderTrackingActivity"
             android:exported="false" />
 
+        <!-- Review Screen -->
+        <activity
+            android:name=".ReviewActivity"
+            android:exported="false" />
+
     </application>
+
 
 </manifest>

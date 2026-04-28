@@ -40,4 +40,11 @@ public interface ApiService {
 
     @POST("users/google-login")
     Call<AuthResponse> googleLogin(@Body java.util.Map<String, String> body);
+
+    @POST("reviews")
+    Call<Void> addReview(@Body java.util.Map<String, Object> review);
+
+    @GET("reviews/outlet/{id}")
+    Call<java.util.Map<String, Object>> getOutletReviews(@Path("id") int outletId);
 }
+

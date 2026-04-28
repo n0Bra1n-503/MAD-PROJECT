@@ -70,6 +70,12 @@ public class HomeFragment extends Fragment implements OutletAdapter.OnOutletClic
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        fetchOutlets();
+    }
+
     private void setupChips() {
         View.OnClickListener chipClickListener = v -> {
             if (selectedChip != null) {
@@ -146,6 +152,8 @@ public class HomeFragment extends Fragment implements OutletAdapter.OnOutletClic
         intent.putExtra("outlet_rating", outlet.getRating());
         intent.putExtra("outlet_image_url", outlet.getImageUrl());
         intent.putExtra("outlet_image_res", outlet.getImageResName());
+        intent.putExtra("is_open", outlet.isOpen());
         startActivity(intent);
+
     }
 }

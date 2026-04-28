@@ -16,11 +16,14 @@ const userRoutes = require('./routes/userRoutes');
 const outletRoutes = require('./routes/outletRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const vendorRoutes = require('./routes/vendorRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
 
 app.use('/api/users', userRoutes);
 app.use('/api/outlets', outletRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/vendors', vendorRoutes);
+app.use('/api/reviews', reviewRoutes);
+
 
 // Health check endpoint
 app.get('/', (req, res) => {

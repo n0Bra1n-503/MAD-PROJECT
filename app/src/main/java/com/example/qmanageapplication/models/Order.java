@@ -20,12 +20,16 @@ public class Order {
 
     private String status; // "Received", "Preparing", "Ready"
 
+    @SerializedName("outlet_id")
+    private int outletId;
+
     @SerializedName("outletImage")
     private String outletImage;
 
-    public Order(int orderId, String outletName, String date, double amount,
+    public Order(int orderId, int outletId, String outletName, String date, double amount,
                  String tokenNumber, String status, String outletImage) {
         this.orderId = orderId;
+        this.outletId = outletId;
         this.outletName = outletName;
         this.date = date;
         this.amount = amount;
@@ -35,7 +39,9 @@ public class Order {
     }
 
     public int getOrderId() { return orderId; }
+    public int getOutletId() { return outletId; }
     public String getOutletName() { return outletName; }
+
     public String getDate() { return date; }
     public double getAmount() { return amount; }
     public String getTokenNumber() { return tokenNumber; }
