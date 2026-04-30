@@ -1,7 +1,6 @@
 const mysql = require('mysql2');
 require('dotenv').config();
 
-// Create MySQL connection pool (more efficient than single connection)
 const pool = mysql.createPool({
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
@@ -18,6 +17,17 @@ const pool = mysql.createPool({
         return next();
     }
 });
+
+/*
+pool.end((err) => {
+  if (err) {
+    console.log("Error closing pool");
+  } else {
+    console.log("All connections closed");
+  }
+});
+*/
+
 
 // Test the connection
 pool.getConnection((err, connection) => {
